@@ -4,6 +4,7 @@ Provides a registry that maps event type strings to their corresponding
 Pydantic model classes, enabling type-safe event deserialization.
 """
 
+from collections.abc import Callable
 from typing import TypeVar
 
 from mkg_lib_events.models.base import BaseEvent
@@ -113,7 +114,7 @@ class EventRegistry:
         cls._registry.clear()
 
 
-def register_event(event_type: str) -> type[T]:
+def register_event(event_type: str) -> Callable[[type[T]], type[T]]:
     """Decorator to register an event class with the registry.
 
     Args:
@@ -132,10 +133,10 @@ def register_event(event_type: str) -> type[T]:
     """
 
     def decorator(cls: type[T]) -> type[T]:
-        EventRegistry.register(event_type, cls)  # type: ignore[arg-type]
+        EventRegistry.register(event_type, cls)
         return cls
 
-    return decorator  # type: ignore[return-value]
+    return decorator
 
 
 def get_event_class(event_type: str) -> type[BaseEvent] | None:

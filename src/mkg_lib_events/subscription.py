@@ -137,7 +137,7 @@ class SubscriptionManager:
                 description=rule_description,
             )
 
-            rule_arn = response.get("RuleArn", "")
+            rule_arn: str = response.get("RuleArn", "")
 
             # Add the target
             target = self._build_target(

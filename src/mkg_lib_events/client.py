@@ -51,11 +51,12 @@ class EventBusClient:
             EventConfigurationError: If event_bus_name is not provided
                 and MKG_EVENT_BUS_NAME is not set.
         """
-        self.event_bus_name = event_bus_name or os.environ.get("MKG_EVENT_BUS_NAME")
-        if not self.event_bus_name:
+        _event_bus_name = event_bus_name or os.environ.get("MKG_EVENT_BUS_NAME")
+        if not _event_bus_name:
             raise EventConfigurationError(
                 "event_bus_name must be provided or MKG_EVENT_BUS_NAME must be set"
             )
+        self.event_bus_name: str = _event_bus_name
 
         self.region = region or os.environ.get("AWS_REGION", "eu-central-1")
 
@@ -86,7 +87,7 @@ class EventBusClient:
             EventPublishError: If the API call fails.
         """
         try:
-            response = self._client.put_events(Entries=entries)
+            response: dict[str, Any] = self._client.put_events(Entries=entries)
 
             failed_count = response.get("FailedEntryCount", 0)
             if failed_count > 0:
@@ -147,7 +148,7 @@ class EventBusClient:
             if description:
                 params["Description"] = description
 
-            response = self._client.put_rule(**params)
+            response: dict[str, Any] = self._client.put_rule(**params)
 
             logger.info(
                 "eventbridge_rule_created",
@@ -190,7 +191,7 @@ class EventBusClient:
             EventPublishError: If the API call fails.
         """
         try:
-            response = self._client.put_targets(
+            response: dict[str, Any] = self._client.put_targets(
                 Rule=rule_name,
                 EventBusName=self.event_bus_name,
                 Targets=targets,
@@ -330,8 +331,9 @@ class EventBusClient:
             if name_prefix:
                 params["NamePrefix"] = name_prefix
 
-            response = self._client.list_rules(**params)
-            return response.get("Rules", [])
+            response: dict[str, Any] = self._client.list_rules(**params)
+            rules: list[dict[str, Any]] = response.get("Rules", [])
+            return rules
 
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "Unknown")

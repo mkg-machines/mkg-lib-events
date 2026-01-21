@@ -251,9 +251,8 @@ class TestSubscriptionManagerEventPattern:
         call_kwargs = mock_client.put_rule.call_args[1]
         assert "event_pattern" in call_kwargs
 
-        import json
-
-        pattern = json.loads(call_kwargs["event_pattern"])
+        # event_pattern is a dict (JSON serialization happens in EventBusClient)
+        pattern = call_kwargs["event_pattern"]
 
         assert pattern["detail-type"] == ["entity.created", "entity.updated"]
         assert pattern["detail"]["tenant_id"] == ["tenant-123"]
@@ -277,9 +276,8 @@ class TestSubscriptionManagerEventPattern:
 
         call_kwargs = mock_client.put_rule.call_args[1]
 
-        import json
-
-        pattern = json.loads(call_kwargs["event_pattern"])
+        # event_pattern is a dict (JSON serialization happens in EventBusClient)
+        pattern = call_kwargs["event_pattern"]
 
         assert pattern["source"] == ["mkg-kernel"]
 

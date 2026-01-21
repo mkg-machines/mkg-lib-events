@@ -7,10 +7,10 @@ for handling transient failures in event processing.
 import random
 import time
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 from mkg_lib_events.logging import get_logger
 
@@ -143,7 +143,7 @@ def _get_backoff_calculator(
 
 
 @dataclass
-class RetryResult:
+class RetryResult(Generic[T]):
     """Result of a retry operation.
 
     Attributes:
@@ -201,7 +201,7 @@ class RetryPolicy:
         self,
         func: Callable[[], T],
         context: dict[str, str] | None = None,
-    ) -> RetryResult:
+    ) -> RetryResult[T]:
         """Execute a function with retry logic.
 
         Args:
@@ -279,9 +279,9 @@ class RetryPolicy:
 
     async def execute_async(
         self,
-        func: Callable[[], T],
+        func: Callable[[], Awaitable[T]],
         context: dict[str, str] | None = None,
-    ) -> RetryResult:
+    ) -> RetryResult[T]:
         """Execute an async function with retry logic.
 
         Args:

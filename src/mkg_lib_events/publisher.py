@@ -35,6 +35,8 @@ class EventPublisher:
         ```
     """
 
+    event_bus_name: str
+
     def __init__(
         self,
         event_bus_name: str | None = None,
